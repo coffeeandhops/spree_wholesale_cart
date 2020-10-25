@@ -16,7 +16,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
 
   context "line items" do
     it "should have line items" do
-      expect(wholesale_order.wholesale_line_items.count).to eq(150)
+      expect(wholesale_order.wholesale_line_items.count).to eq(15)
     end
   end
 

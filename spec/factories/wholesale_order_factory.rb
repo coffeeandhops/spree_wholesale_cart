@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :wholesale_order, class: Spree::WholesaleOrder do
     transient do
-      line_items_count { 150 }
+      line_items_count { 15 }
       line_items_quantity { 10 }
       line_items_price { 20.0 }
     end
@@ -14,6 +14,9 @@ FactoryBot.define do
       end
       
       ws_order.wholesale_line_items.reload # to ensure order.line_items is accessible after
+      ws_order.update_totals
+      ws_order.save
+      ws_order.reload
     end
   end
 end

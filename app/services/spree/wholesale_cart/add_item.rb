@@ -31,6 +31,12 @@ module Spree
 
         return failure(line_item) unless line_item.save
 
+        wholesale_order.retail_item_total += (line_item.retail_price * line_item.quantity)
+        wholesale_order.wholesale_total += (line_item.wholesale_price * line_item.quantity)
+        wholesale_order.save
+
+        # wholesale_order.update_totals
+        # wholesale_order.save
         # line_item.reload.update_price
 
         # ::Spree::TaxRate.adjust(wholesale_order, [line_item]) if line_item_created
