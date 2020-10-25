@@ -34,6 +34,7 @@ module Spree
       def save_default_wholesale_price
         default_wholesale_price.save if default_wholesale_price_changed?
       end
+
     end
   end
 end

@@ -15,12 +15,12 @@ module Spree
       less_than_or_equal_to: MAXIMUM_AMOUNT
     }
 
-    alias_attribute :price, :amount
+    # alias_attribute :price, :amount
     alias_attribute :wholesale_price, :amount
-    alias_attribute :wholesale_price=, :price=
+    alias_attribute :wholesale_price=, :amount=
 
     extend DisplayMoney
-    money_methods :amount, :price, :wholesale_price
+    money_methods :amount, :wholesale_price
 
     self.whitelisted_ransackable_attributes = ['amount']
 
@@ -34,7 +34,7 @@ module Spree
 
     def wholesale_price_including_vat_for(price_options)
       options = price_options.merge(tax_category: variant.tax_category)
-      gross_amount(price, options)
+      gross_amount(wholesale_price, options)
     end
 
     def display_wholesale_price_including_vat_for(price_options)

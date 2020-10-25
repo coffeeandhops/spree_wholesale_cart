@@ -23,8 +23,8 @@ RSpec.describe Spree::WholesalePrice, type: :model do
         price.amount = amount
       end
 
-      it 'is expected to equal to price' do
-        expect(price.amount).to eq(price.price)
+      it 'is expected to equal to wholesale_price' do
+        expect(price.amount).to eq(price.wholesale_price)
       end
     end
   end
@@ -97,7 +97,7 @@ RSpec.describe Spree::WholesalePrice, type: :model do
       end
 
       it 'returns the correct price' do
-        expect(price).to receive(:price).and_call_original
+        expect(price).to receive(:wholesale_price).and_call_original
         expect(price_with_vat).to eq(10.00)
       end
     end
@@ -109,7 +109,7 @@ RSpec.describe Spree::WholesalePrice, type: :model do
       end
 
       it 'returns the correct price' do
-        expect(price).to receive(:price).and_call_original
+        expect(price).to receive(:wholesale_price).and_call_original
         expect(price.wholesale_price_including_vat_for(tax_zone: zone)).to eq(10.00)
       end
     end

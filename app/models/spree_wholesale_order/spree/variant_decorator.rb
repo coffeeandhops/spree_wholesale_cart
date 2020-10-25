@@ -16,6 +16,8 @@ module SpreeWholesaleOrder
           class_name: 'Spree::WholesalePrice',
           dependent: :destroy,
           inverse_of: :variant
+        
+        base.validate :check_wholesale_price
 
         class << base
           prepend ClassMethods
@@ -32,6 +34,15 @@ module SpreeWholesaleOrder
 
       def is_wholesaleable?
         wholesale_price.present? && wholesale_price > 0
+      end
+
+
+      private
+
+      def check_wholesale_price
+        if wholesale_price.nil?
+          self.wholesale_price = 0.0
+        end
       end
 
     end

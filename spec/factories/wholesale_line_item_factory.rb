@@ -6,7 +6,8 @@ FactoryBot.define do
     end
     wholesale_order
     quantity { item_quantity }
-    price    { BigDecimal('20.00') }
+    retail_price    { BigDecimal('20.00') }
+    wholesale_price    { BigDecimal('10.00') }
     currency { wholesale_order.currency }
     variant { product.master }
   end

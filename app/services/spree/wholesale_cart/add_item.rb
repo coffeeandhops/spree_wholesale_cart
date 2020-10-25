@@ -21,7 +21,8 @@ module Spree
         if line_item.nil?
           line_item = wholesale_order.wholesale_line_items.new(
             quantity: quantity,
-            price: variant.price,
+            wholesale_price: variant.wholesale_price,
+            retail_price: variant.price,
             variant: variant,
             currency: wholesale_order.currency)
         else
