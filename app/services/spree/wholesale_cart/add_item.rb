@@ -32,7 +32,7 @@ module Spree
         return failure(line_item) unless line_item.save
 
         wholesale_order.retail_item_total += (line_item.retail_price * line_item.quantity)
-        wholesale_order.wholesale_total += (line_item.wholesale_price * line_item.quantity)
+        wholesale_order.wholesale_item_total += (line_item.wholesale_price * line_item.quantity)
         wholesale_order.save
 
         # wholesale_order.update_totals

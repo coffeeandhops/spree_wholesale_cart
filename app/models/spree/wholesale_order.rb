@@ -6,7 +6,7 @@ class Spree::WholesaleOrder < Spree::Base
   delegate :number, :email, :currency, to: :order
 
   def update_totals
-    self.wholesale_total = wholesale_line_items.sum('wholesale_price * quantity')
+    self.wholesale_item_total = wholesale_line_items.sum('wholesale_price * quantity')
     self.retail_item_total = wholesale_line_items.sum('retail_price * quantity')
   end
 
