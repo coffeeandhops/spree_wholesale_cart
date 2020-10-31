@@ -6,7 +6,6 @@ module Spree
       def call(wholesale_order:, variant:, quantity: nil)
         ApplicationRecord.transaction do
           run :add_to_line_item
-          # run Spree::Dependencies.cart_recalculate_service.constantize
         end
       end
 
@@ -31,13 +30,7 @@ module Spree
 
         return failure(line_item) unless line_item.save
 
-        wholesale_order.retail_item_total += (line_item.retail_price * line_item.quantity)
-        wholesale_order.wholesale_item_total += (line_item.wholesale_price * line_item.quantity)
-        wholesale_order.save
-
-        # wholesale_order.update_totals
-        # wholesale_order.save
-        # line_item.reload.update_price
+        Spree::WholesaleCart::UpdateTotals.new.call(wholesale_order: wholesale_order, line_item: line_item)
 
         # ::Spree::TaxRate.adjust(wholesale_order, [line_item]) if line_item_created
         success(wholesale_order: wholesale_order, wholesale_line_item: line_item, line_item_created: line_item_created)

@@ -22,6 +22,7 @@ module Spree
         wholesale_order.reload
         expect(execute).to be_success
         expect(value[:wholesale_line_item]).to eq expected
+        expect(value[:wholesale_order]).to eq wholesale_order
         expect(expected.quantity).to eq qty
         expect(wholesale_order.wholesale_item_total).to eq(current_wholesale + (expected.wholesale_price * expected.quantity))
         expect(wholesale_order.retail_item_total).to eq(current_retail + (expected.retail_price * expected.quantity))
