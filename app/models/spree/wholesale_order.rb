@@ -10,4 +10,27 @@ class Spree::WholesaleOrder < Spree::Base
     self.retail_item_total = wholesale_line_items.sum('retail_price * quantity')
   end
 
+  def is_wholesale?
+    # !user.nil? && user.wholesaler? && minimum_order
+    minimum_wholsale_order?
+  end
+
+  def minimum_wholsale_order?
+    # return false if user.nil? || !user.wholesaler?
+    minimum = minimum_order_value
+    return wholesale_item_total >= minimum unless minimum_order_on_retail
+    return retail_item_total >= minimum
+  end
+
+  private
+  attr_accessor :config_minimum_order_value, :minimum_order_on_retail
+
+  def minimum_order_value
+    @config_minimum_order_value ||= ::Spree::WholesaleOrder::Config[:minimum_order]
+  end
+
+  def minimum_order_on_retail
+    @minimum_order_on_retail ||= ::Spree::WholesaleOrder::Config[:minimum_order_on_retail]
+  end
+
 end

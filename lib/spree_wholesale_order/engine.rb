@@ -8,6 +8,12 @@ module SpreeWholesaleOrder
     config.generators do |g|
       g.test_framework :rspec
     end
+    
+    config.autoload_paths += %W(#{config.root}/lib)
+    
+    initializer 'spree.wholesale_storefront.environment', before: :load_config_initializers do
+      Spree::WholesaleOrder::Config = ::Spree::WholesaleOrderConfiguration.new
+    end
 
     def self.activate
       Dir.glob(File.join(File.dirname(__FILE__), '../../app/**/*_decorator*.rb')) do |c|
