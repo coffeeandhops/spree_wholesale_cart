@@ -14,8 +14,8 @@ module Spree
       it do
         current_retail = wholesale_order.retail_item_total
         current_wholesale = wholesale_order.wholesale_item_total
+        
         expect { execute }.to change(LineItem, :count)
-
         expect(execute).to be_success
         expect(order.line_items.count).to eq(wholesale_order.wholesale_line_items.count)
         expect(order.total).to eq(default_wholesale_total)

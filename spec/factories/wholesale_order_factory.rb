@@ -1,12 +1,14 @@
 FactoryBot.define do
   factory :wholesale_order, class: Spree::WholesaleOrder do
     transient do
+      wholesaler { create(:wholesaler) }
       line_items_count { 15 }
       line_items_quantity { 10 }
       line_items_price { 20.0 }
     end
 
     order { create(:order) }
+    user { wholesaler.user }
 
     after(:create) do |ws_order, evaluator|
       evaluator.line_items_count.times do
