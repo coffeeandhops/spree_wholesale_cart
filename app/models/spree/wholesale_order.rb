@@ -12,10 +12,10 @@ class Spree::WholesaleOrder < Spree::Base
 
   def is_wholesale?
     # !user.nil? && user.wholesaler? && minimum_order
-    minimum_wholsale_order?
+    minimum_wholesale_order?
   end
 
-  def minimum_wholsale_order?
+  def minimum_wholesale_order?
     # return false if user.nil? || !user.wholesaler?
     minimum = minimum_order_value
     return wholesale_item_total >= minimum unless minimum_order_on_retail
