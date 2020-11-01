@@ -2,7 +2,7 @@ module SpreeWholesaleOrder
   class Engine < Rails::Engine
     require 'spree/core'
     isolate_namespace Spree
-    engine_name 'spree_wholesale_order'
+    engine_name 'spree_wholesale_cart'
 
     # use rspec for tests
     config.generators do |g|

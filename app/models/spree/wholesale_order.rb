@@ -19,7 +19,7 @@ module Spree
     end
   
     def is_wholesale?
-      !user.nil? && user.wholesaler? && minimum_order
+      !user.nil? && user.wholesaler? && minimum_wholesale_order?
     end
   
     def minimum_wholesale_order?

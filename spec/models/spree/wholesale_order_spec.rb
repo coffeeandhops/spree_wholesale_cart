@@ -26,7 +26,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
     end
   
     it "should be minimum wholesale order" do
-      expect(wholesale_order.minimum_wholsale_order?).to be true
+      expect(wholesale_order.minimum_wholesale_order?).to be true
     end
 
     context "not minimum order" do
@@ -35,7 +35,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
       end
 
       it "should not be minimum wholesale order" do
-        expect(wholesale_order.minimum_wholsale_order?).to be false
+        expect(wholesale_order.minimum_wholesale_order?).to be false
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
     end
 
     it "should be minimum retail order" do
-      expect(wholesale_order.minimum_wholsale_order?).to be true
+      expect(wholesale_order.minimum_wholesale_order?).to be true
     end
 
     context "not min retail order" do
@@ -56,7 +56,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
       end
 
       it "should not be minimum retail order" do
-        expect(wholesale_order.minimum_wholsale_order?).to be false
+        expect(wholesale_order.minimum_wholesale_order?).to be false
       end
 
     end

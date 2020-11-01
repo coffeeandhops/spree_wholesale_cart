@@ -4,7 +4,7 @@ module SpreeWholesaleOrder
       class_option :auto_run_migrations, type: :boolean, default: false
 
       def add_migrations
-        run 'bundle exec rake railties:install:migrations FROM=spree_wholesale_order'
+        run 'bundle exec rake railties:install:migrations FROM=spree_wholesale_cart'
       end
 
       def run_migrations

@@ -25,7 +25,7 @@ module Spree
 
     def geocodez
       # Not sure why I need to do the config here
-      Geocoder.configure(lookup: :google, api_key: ::Spree::WholesaleOrder::Config[:google_map_api_key])
+      Geocoder.configure(lookup: :google, api_key: ::Spree::WholesaleOrder::Config[:google_map_api_key]) unless ENV["RAILS_ENV"] == "test"
       geocode
     end
 
