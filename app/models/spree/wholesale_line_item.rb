@@ -16,6 +16,29 @@ class Spree::WholesaleLineItem < Spree::Base
 
   validate :ensure_proper_currency, if: -> { wholesale_order.present? }
 
+  def total_wholesale_price
+    return 0.0 if variant.nil? || wholesale_price.nil? || quantity.nil?
+    wholesale_price * quantity
+  end
+  
+  def total_retail_price
+    return 0.0 if variant.nil? || retail_price.nil? || quantity.nil?
+    retail_price * quantity
+  end
+
+  def display_wholesale_price
+    ::Spree::Money.new(wholesale_price, currency: currency)
+  end
+
+  def display_total_wholesale_price
+    ::Spree::Money.new(total_wholesale_price, currency: currency)
+  end
+
+  def display_total_retail_price
+    ::Spree::Money.new(total_retail_price, currency: currency)
+  end
+
+
   private
   
   def ensure_valid_quantity

@@ -1,0 +1,30 @@
+module SpreeWholesaleCart
+  module Spree
+    module CartSerializerDecorator
+      def self.prepended(base)
+        base.attribute :is_wholesale, &:is_wholesale?
+        base.attribute :wholesale_item_total, &:wholesale_item_total
+        base.attribute :display_wholesale_item_total, &:display_wholesale_item_total
+
+      end
+    end
+  end
+end
+
+Spree::V2::Storefront::CartSerializer.prepend SpreeWholesaleCart::Spree::CartSerializerDecorator
+
+
+module Spree
+  module V2
+    module Storefront
+      class WholesaleCartSerializer < BaseSerializer
+        set_type :wholesale_order
+
+        attributes :wholesale_item_total, :retail_item_total, :order_id
+
+        attribute :display_wholesale_item_total, &:display_wholesale_item_total
+        attribute :display_retail_item_total, &:display_retail_item_total
+      end
+    end
+  end
+end
