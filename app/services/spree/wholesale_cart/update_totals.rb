@@ -14,6 +14,7 @@ module Spree
 
           wholesale_order.retail_item_total += (retail_price_adjustment * sign)
           wholesale_order.wholesale_item_total += (wholesale_price_adjustment * sign)
+          wholesale_order.item_count += (quantity * sign)
           wholesale_order.save
         end
         success(wholesale_order)

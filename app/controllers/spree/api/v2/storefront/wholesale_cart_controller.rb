@@ -53,11 +53,11 @@ module Spree
             @current_ability ||= Spree::WholesalerAbility.new(spree_current_user)
           end
 
-          def scope_includes
-            {
-              user: {}
-            }
-          end
+          # def scope_includes
+          #   {
+          #     user: {}
+          #   }
+          # end
 
         end
       end

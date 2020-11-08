@@ -1,5 +1,6 @@
 class Spree::WholesaleLineItem < Spree::Base
   before_validation :ensure_valid_quantity
+  extend ::Spree::DisplayMoney
 
   belongs_to :wholesale_order
   belongs_to :variant, class_name: 'Spree::Variant'
@@ -15,6 +16,8 @@ class Spree::WholesaleLineItem < Spree::Base
   validates :retail_price, numericality: true
 
   validate :ensure_proper_currency, if: -> { wholesale_order.present? }
+
+  money_methods :retail_price, :wholesale_price
 
   def total_wholesale_price
     return 0.0 if variant.nil? || wholesale_price.nil? || quantity.nil?

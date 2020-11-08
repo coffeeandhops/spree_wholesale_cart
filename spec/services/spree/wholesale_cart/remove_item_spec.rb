@@ -14,6 +14,7 @@ module Spree
       it do
         current_retail = wholesale_order.retail_item_total
         current_wholesale = wholesale_order.wholesale_item_total
+        current_item_count = wholesale_order.item_count
 
         expect { execute }.to change(WholesaleLineItem, :count)
         wholesale_order.reload
@@ -21,6 +22,7 @@ module Spree
         expect(wholesale_order.wholesale_line_items.count).to eq(14)
         expect(wholesale_order.wholesale_item_total).to eq(current_wholesale - 100.0)
         expect(wholesale_order.retail_item_total).to eq(current_retail - 200.0)
+        expect(wholesale_order.item_count).to eq(current_item_count - 10)
       end
     end
 
@@ -32,6 +34,7 @@ module Spree
       it do
         current_retail = wholesale_order.retail_item_total
         current_wholesale = wholesale_order.wholesale_item_total
+        current_item_count = wholesale_order.item_count
 
         expect { execute }.to_not change(WholesaleLineItem, :count)
         wholesale_order.reload
@@ -40,6 +43,7 @@ module Spree
         expect(wholesale_order.wholesale_line_items.count).to eq(15)
         expect(wholesale_order.wholesale_item_total).to eq(current_wholesale - 50.0)
         expect(wholesale_order.retail_item_total).to eq(current_retail - 100.0)
+        expect(wholesale_order.item_count).to eq(current_item_count - quantity)
       end
 
       context 'with invalid quanities' do

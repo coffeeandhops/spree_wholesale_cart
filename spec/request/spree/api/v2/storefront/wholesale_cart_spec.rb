@@ -21,7 +21,8 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
     context 'as wholesaler' do
       before { get "/api/v2/storefront/wholesale_cart", headers: headers }
-      # it_behaves_like 'returns 200 HTTP status'
+
+      it_behaves_like 'returns 200 HTTP status'
 
       it 'returns a valid JSON response' do
         expect(json_response['data']).to have_id(wholesale_order.id.to_s)
@@ -30,15 +31,17 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
         expect(json_response['data']).to have_attribute(:retail_item_total).with_value(wholesale_order.retail_item_total.to_s)
         expect(json_response['data']).to have_attribute(:display_wholesale_item_total).with_value(wholesale_order.display_wholesale_item_total.to_s)
         expect(json_response['data']).to have_attribute(:display_retail_item_total).with_value(wholesale_order.display_retail_item_total.to_s)
+        expect(json_response['data']).to have_attribute(:item_count).with_value(wholesale_order.item_count)
       end
 
-      # context 'with params "include=user"' do
-      #   before { get "/api/v2/storefront/wholesalers/#{wholesaler.id}?include=user", headers: headers }
+      context 'with params "include=wholesale_line_items,variants"' do
+        before { get "/api/v2/storefront/wholesale_cart?include=wholesale_line_items,variants", headers: headers }
   
-      #   it 'returns wholesale_cart data with included user' do
-      #     expect(json_response['included']).to    include(have_type('user'))
-      #   end
-      # end
+        it 'returns wholesale_cart data with included wholesale_line_items' do
+          expect(json_response['included']).to    include(have_type('wholesale_line_item'))
+          expect(json_response['included']).to    include(have_type('variant'))
+        end
+      end
 
     end
   end

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :wholesale_order, class: Spree::WholesaleOrder do
-    # order
+    order
     transient do
       wholesaler { create(:wholesaler, wholesale_user: order.user) }
       line_items_count { 15 }
