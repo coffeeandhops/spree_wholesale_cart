@@ -34,9 +34,33 @@ RSpec.configure do |config|
   # current_path.should eql(spree.products_path)
   config.include Spree::TestingSupport::UrlHelpers
 
+  # config.include Spree::Api::TestingSupport::Helpers, type: :controller
+  # config.include Spree::Api::TestingSupport::Helpers, type: :request
+  # config.extend Spree::Api::TestingSupport::Setup, type: :controller
+
+
+
+
+  config.include JSONAPI::RSpec
+  config.include FactoryBot::Syntax::Methods
   config.include Spree::Api::TestingSupport::Helpers, type: :controller
   config.include Spree::Api::TestingSupport::Helpers, type: :request
   config.extend Spree::Api::TestingSupport::Setup, type: :controller
+  config.include Spree::TestingSupport::Preferences, type: :controller
+  # config.include Spree::TestingSupport::ImageHelpers
+
+  config.before do
+    Spree::Api::Config[:requires_authentication] = true
+  end
+
+  # config.include VersionCake::TestHelpers, type: :controller
+  config.before(:each, type: :controller) do
+    set_request_version('', 1)
+  end
+
+
+
+
 
   # == Mock Framework
   #

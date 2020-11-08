@@ -1,11 +1,14 @@
 module Spree
   class WholesaleOrder < Spree::Base
     # before_validation :update_totals
-  
+    extend ::Spree::DisplayMoney
+    
     belongs_to :order, class_name: "Spree::Order", foreign_key: "order_id"
     has_many :wholesale_line_items, class_name: "Spree::WholesaleLineItem"
     delegate :number, :email, :currency, :token, to: :order
-  
+    
+    money_methods :wholesale_item_total, :retail_item_total
+    
     if Spree.user_class
       belongs_to :user, class_name: Spree.user_class.to_s, optional: true
     else
