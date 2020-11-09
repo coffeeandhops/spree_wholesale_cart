@@ -15,6 +15,18 @@ module Spree
           end
 
           def add_item
+            variant = Spree::Variant.find(params[:variant_id])
+
+            spree_authorize! :update, spree_current_order, order_token
+            spree_authorize! :show, variant
+
+            result = add_item_service.call(
+              wholesale_order: spree_current_wholesale_order,
+              variant: variant,
+              quantity: params[:quantity]
+            )
+
+            render_wholesale_order(result)            
           end
 
           def empty
@@ -49,8 +61,32 @@ module Spree
             Spree::WholesaleOrder.accessible_by(current_ability, :show).includes(scope_includes)
           end
 
-          def current_ability
-            @current_ability ||= Spree::WholesalerAbility.new(spree_current_user)
+          # def current_ability
+          #   @current_ability ||= Spree::WholesalerAbility.new(spree_current_user, spree_current_order)
+          # end
+
+          def add_item_service
+            Spree::WholesaleCart::AddItem.new
+          end
+
+          def render_wholesale_order(result)
+            if result.success?
+              render_serialized_payload { serialized_current_wholesale_order }
+            else
+              render_error_payload(result.error)
+            end
+          end
+
+          def serialize_wholesale_order(order)
+            resource_serializer.new(spree_current_wholesale_order.reload, include: resource_includes, fields: sparse_fields).serializable_hash
+          end
+
+          def serialized_current_wholesale_order
+            serialize_wholesale_order(spree_current_order.wholesale_order)
+          end
+
+          def spree_current_wholesale_order
+            @spree_current_wholesale_order ||= spree_current_order.wholesale_order
           end
 
           # def scope_includes

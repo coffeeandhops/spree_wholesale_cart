@@ -12,6 +12,8 @@ module Spree
         attribute :display_retail_price, &:display_retail_price
         attribute :display_total_wholesale_price, &:display_total_wholesale_price
         attribute :display_total_retail_price, &:display_total_retail_price
+
+        belongs_to :variant
       end
     end
   end

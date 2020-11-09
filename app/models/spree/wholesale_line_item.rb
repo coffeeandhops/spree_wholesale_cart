@@ -17,6 +17,7 @@ class Spree::WholesaleLineItem < Spree::Base
 
   validate :ensure_proper_currency, if: -> { wholesale_order.present? }
 
+  validate :validate_stock_quantity
   money_methods :retail_price, :wholesale_price
 
   def total_wholesale_price
@@ -53,4 +54,22 @@ class Spree::WholesaleLineItem < Spree::Base
       errors.add(:currency, :must_match_order_currency)
     end
   end
+
+
+  def validate_stock_quantity
+    return if item_available?(quantity)
+
+    display_name = variant.name.to_s
+    display_name += " (#{variant.options_text})" unless variant.options_text.blank?
+
+    errors[:quantity] << Spree.t(
+      :selected_quantity_not_available,
+      item: display_name.inspect
+    )
+  end
+
+  def item_available?(quantity)
+    Spree::Stock::Quantifier.new(variant).can_supply?(quantity)
+  end
+
 end
