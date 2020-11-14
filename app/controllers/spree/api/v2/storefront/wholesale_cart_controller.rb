@@ -6,6 +6,7 @@ module Spree
           include Spree::Api::V2::CollectionOptionsHelpers
           include Spree::Api::V2::Storefront::OrderConcern
           before_action :ensure_order, except: :create
+          before_action :ensure_wholesale_order, except: :create
           before_action :require_spree_current_user
 
           def show
@@ -33,6 +34,14 @@ module Spree
           end
 
           def remove_line_item
+            spree_authorize! :update, spree_current_order, order_token
+
+            remove_line_item_service.call(
+              wholesale_order: spree_current_wholesale_order,
+              line_item: wholesale_line_item
+            )
+
+            render_serialized_payload { serialized_current_wholesale_order }
           end
 
           def set_quantity
@@ -69,6 +78,10 @@ module Spree
             Spree::WholesaleCart::AddItem.new
           end
 
+          def remove_line_item_service
+            Spree::WholesaleCart::RemoveLineItem.new
+          end
+
           def render_wholesale_order(result)
             if result.success?
               render_serialized_payload { serialized_current_wholesale_order }
@@ -87,6 +100,14 @@ module Spree
 
           def spree_current_wholesale_order
             @spree_current_wholesale_order ||= spree_current_order.wholesale_order
+          end
+
+          def ensure_wholesale_order
+            raise ActiveRecord::RecordNotFound if spree_current_wholesale_order.nil?
+          end
+
+          def wholesale_line_item
+            @wholesale_line_item ||= spree_current_wholesale_order.wholesale_line_items.find(params[:wholesale_line_item_id])
           end
 
           # def scope_includes

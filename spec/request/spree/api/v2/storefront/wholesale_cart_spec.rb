@@ -14,6 +14,7 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
   let(:wholesale_headers_bearer) { { 'Authorization' => "Bearer #{wholesale_token.token}" } }
   let(:wholesale_headers_order_token) { { 'X-Spree-Order-Token' => wholesale_order.token } }
   let(:headers) { { 'X-Spree-Order-Token' => wholesale_order.token, 'Authorization' => "Bearer #{wholesale_token.token}" } }
+  # let!(:wholesale_line_item) { create(:wholessale_line_item, wholesale_order: wholesale_order) }
 
 
   shared_examples 'returns valid wholesale_cart JSON' do
@@ -30,6 +31,33 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
   end
 
+
+  shared_examples 'no current wholesale order' do
+    context "order doesn't exist" do
+      before do
+        wholesale_order.destroy
+        execute
+      end
+  
+      it_behaves_like 'returns 404 HTTP status'
+    end
+  
+    # context 'already completed order' do
+    #   before do
+    #     wholesale_order.update_column(:completed_at, Time.current)
+    #     execute
+    #   end
+  
+    #   it_behaves_like 'returns 404 HTTP status'
+    # end
+  end
+
+  shared_context 'creates guest wholesale_order with guest token' do
+    let(:guest_token) { 'guest_token' }
+    let!(:order)      { create(:order, token: guest_token, store: store, currency: currency) }
+    let(:order_token) { { 'X-Spree-Order-Token' => order.token } }
+    let!(:headers)    { order_token }
+  end
 
   describe 'wholesale_Cart#show' do
     before do
@@ -96,6 +124,55 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     context 'as wholesaler' do
       it_behaves_like 'adds item'
       it_behaves_like 'doesnt add item with quantity unnavailable'
+    end
+
+  end
+
+
+  describe 'wholesale_cart#remove_line_item' do
+    let!(:wholesale_line_item) { wholesale_order.wholesale_line_items.last }
+    let(:execute) { delete "/api/v2/storefront/wholesale_cart/remove_line_item/#{wholesale_line_item.id}", headers: headers }
+
+    before do
+      allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
+    end
+
+    shared_examples 'removes wholesale_line item' do
+      before { execute }
+
+      context 'without line items' do
+        let!(:wholesale_line_item) { create(:wholesale_line_item) }
+
+        it_behaves_like 'returns 404 HTTP status'
+      end
+
+      context 'containing line item' do
+
+        it_behaves_like 'returns 200 HTTP status'
+        it_behaves_like 'returns valid wholesale_cart JSON'
+
+        it 'removes wholesale_line item from the cart' do
+          expect(wholesale_order.wholesale_line_items.count).to eq(14)
+        end
+      end
+    end
+
+    context 'as a signed in user' do
+      # include_context 'creates order with line item'
+
+      context 'with existing order' do
+        it_behaves_like 'removes wholesale_line item'
+      end
+
+      # it_behaves_like 'no current wholesale order'
+    end
+
+    context 'as a guest user' do
+      before { execute }
+
+      include_context 'creates guest wholesale_order with guest token'
+
+      it_behaves_like 'returns 403 HTTP status'
     end
 
   end
