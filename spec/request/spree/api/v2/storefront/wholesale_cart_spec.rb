@@ -100,11 +100,10 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
       allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
     end
 
+    it_behaves_like 'wholesale order'
+
     shared_examples 'adds item' do
       before { execute }
-
-      it_behaves_like 'returns 200 HTTP status'
-      it_behaves_like 'returns valid wholesale_cart JSON'
 
       it 'with success' do
         expect(wholesale_order.wholesale_line_items.count).to eq(16)
@@ -136,7 +135,6 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
   end
 
-
   describe 'wholesale_cart#remove_line_item' do
     let!(:wholesale_line_item) { wholesale_order.wholesale_line_items.last }
     let(:execute) { delete "/api/v2/storefront/wholesale_cart/remove_line_item/#{wholesale_line_item.id}", headers: headers }
@@ -144,6 +142,8 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     before do
       allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
     end
+
+    it_behaves_like 'wholesale order'
 
     shared_examples 'removes wholesale_line item' do
       before { execute }
@@ -156,8 +156,8 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
       context 'containing line item' do
 
-        it_behaves_like 'returns 200 HTTP status'
-        it_behaves_like 'returns valid wholesale_cart JSON'
+        # it_behaves_like 'returns 200 HTTP status'
+        # it_behaves_like 'returns valid wholesale_cart JSON'
 
         it 'removes wholesale_line item from the cart' do
           expect(wholesale_order.wholesale_line_items.count).to eq(14)
@@ -184,7 +184,6 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
 
   end
-
 
   describe 'wholesale_cart#empty' do
     let(:execute) { patch '/api/v2/storefront/wholesale_cart/empty', headers: headers }

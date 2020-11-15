@@ -20,6 +20,17 @@ module Spree
         expect(wholesale_order.wholesale_item_total).to eq(current_wholesale - 100.0)
         expect(wholesale_order.retail_item_total).to eq(current_retail - 200.0)
       end
+
+      context 'locked wholesale order' do
+        before do
+          wholesale_order.update_columns(locked: true)
+          execute
+        end
+
+        it do
+          expect(execute).to_not be_success
+        end
+      end
     end
 
   end

@@ -40,12 +40,12 @@ module Spree
           def remove_line_item
             spree_authorize! :update, spree_current_order, order_token
 
-            remove_line_item_service.call(
+            result = remove_line_item_service.call(
               wholesale_order: spree_current_wholesale_order,
               line_item: wholesale_line_item
             )
-
-            render_serialized_payload { serialized_current_wholesale_order }
+            
+            render_wholesale_order(result)
           end
 
           def set_quantity

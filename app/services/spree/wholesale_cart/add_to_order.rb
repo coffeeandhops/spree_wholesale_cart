@@ -4,6 +4,10 @@ module Spree
       prepend Spree::ServiceModule::Base
 
       def call(wholesale_order:, options: {})
+        return failure(
+          wholesale_order,
+          Spree.t('wholesale_cart_is_locked', scope: 'wholesale_cart')) if wholesale_order.locked
+
         ApplicationRecord.transaction do
           run :add_line_items_to_order
           run ::Spree::WholesaleCart::OrderRecalculate
