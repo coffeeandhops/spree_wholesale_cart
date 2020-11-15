@@ -27,10 +27,14 @@ module Spree
               quantity: params[:quantity]
             )
 
-            render_wholesale_order(result)            
+            render_wholesale_order(result)
           end
 
           def empty
+            spree_authorize! :update, spree_current_order, order_token
+
+            result = empty_service.call(wholesale_order: spree_current_wholesale_order)
+            render_wholesale_order(result)
           end
 
           def remove_line_item
@@ -80,6 +84,14 @@ module Spree
 
           def remove_line_item_service
             Spree::WholesaleCart::RemoveLineItem.new
+          end
+
+          def empty_service
+            Spree::WholesaleCart::Empty.new
+          end
+
+          def locked_order_service
+            Spree::WholesaleCart::LockedOrder.new
           end
 
           def render_wholesale_order(result)

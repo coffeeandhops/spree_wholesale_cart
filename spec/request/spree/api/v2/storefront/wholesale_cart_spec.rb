@@ -31,6 +31,22 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
   end
 
+  shared_examples 'wholesale order' do
+    context "success" do
+      before { execute }
+      it_behaves_like 'returns 200 HTTP status'
+      it_behaves_like 'returns valid wholesale_cart JSON'
+    end
+
+    context 'locked wholesale order' do
+      before do
+        wholesale_order.update_columns(locked: true)
+        execute
+      end
+
+      it_behaves_like 'returns 422 HTTP status'
+    end
+  end
 
   shared_examples 'no current wholesale order' do
     context "order doesn't exist" do
@@ -41,15 +57,7 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
   
       it_behaves_like 'returns 404 HTTP status'
     end
-  
-    # context 'already completed order' do
-    #   before do
-    #     wholesale_order.update_column(:completed_at, Time.current)
-    #     execute
-    #   end
-  
-    #   it_behaves_like 'returns 404 HTTP status'
-    # end
+ 
   end
 
   shared_context 'creates guest wholesale_order with guest token' do
@@ -177,4 +185,45 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
   end
 
+
+  describe 'wholesale_cart#empty' do
+    let(:execute) { patch '/api/v2/storefront/wholesale_cart/empty', headers: headers }
+    
+    before do
+      allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
+    end
+
+    shared_examples 'emptying the order' do
+      before { execute }
+
+      # it_behaves_like 'returns 200 HTTP status'
+      # it_behaves_like 'returns valid wholesale_cart JSON'
+
+      it 'empties the order' do
+        expect(wholesale_order.reload.wholesale_line_items.count).to eq(0)
+      end
+    end
+
+    context 'as a signed in user' do
+      
+      it_behaves_like 'wholesale order'
+
+      it_behaves_like 'emptying the order'
+
+      it_behaves_like 'no current wholesale order'
+
+    end
+
+    context 'as a guest user' do
+      
+      context 'with existing guest order with line item' do
+        before { execute }
+        include_context 'creates guest wholesale_order with guest token'
+
+        it_behaves_like 'returns 404 HTTP status'
+      end
+
+      it_behaves_like 'no current wholesale order'
+    end
+  end
 end

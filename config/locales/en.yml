@@ -3,3 +3,6 @@
 
 en:
   hello: "Hello world"
+  spree:
+    wholesale_cart:
+      wholesale_cart_is_locked: "Wholesale cart is locked. You cannot make any changes."
