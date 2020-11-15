@@ -51,5 +51,16 @@ module Spree
       end
     end
 
+    context 'locked wholesale order' do
+      before do
+        wholesale_order.update_columns(locked: true)
+        execute
+      end
+
+      it do
+        expect(execute).to_not be_success
+      end
+    end
+
   end
 end

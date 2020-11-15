@@ -19,6 +19,8 @@ module Spree
         expect(execute).to be_success
         expect(order.line_items.count).to eq(wholesale_order.wholesale_line_items.count)
         expect(order.total).to eq(default_wholesale_total)
+        expect(wholesale_order.locked).to be true
+        expect(order.locked).to be true
       end
 
       context 'orders under min' do
@@ -41,6 +43,16 @@ module Spree
         end
       end
 
+      context 'locked wholesale order' do
+        before do
+          wholesale_order.update_columns(locked: true)
+          execute
+        end
+
+        it do
+          expect(execute).to_not be_success
+        end
+      end
     end
   end
 end
