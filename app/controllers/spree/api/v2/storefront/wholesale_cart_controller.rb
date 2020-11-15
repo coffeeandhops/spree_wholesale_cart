@@ -5,9 +5,18 @@ module Spree
         class WholesaleCartController < ::Spree::Api::V2::BaseController
           include Spree::Api::V2::CollectionOptionsHelpers
           include Spree::Api::V2::Storefront::OrderConcern
-          before_action :ensure_order, except: :create
+          before_action :ensure_order
           before_action :ensure_wholesale_order, except: :create
           before_action :require_spree_current_user
+
+          def create
+            spree_authorize! :create, Spree::WholesaleOrder
+
+            wholesale_order   = spree_current_wholesale_order if spree_current_wholesale_order.present?
+            wholesale_order ||= create_service.call(order: spree_current_order).value
+
+            render_serialized_payload(201) { serialize_order(wholesale_order) }
+          end
 
           def show
             spree_authorize! :show, spree_current_order, order_token
@@ -49,6 +58,16 @@ module Spree
           end
 
           def set_quantity
+            spree_authorize! :update, spree_current_order, order_token
+
+            line_item = Spree::WholesaleLineItem.find(params[:wholesale_line_item_id])
+
+            result = set_quantity_service.call(
+              wholesale_order: spree_current_wholesale_order,
+              line_item: line_item,
+              quantity: params[:quantity].to_i)
+
+            render_wholesale_order(result)
           end
 
           private
@@ -74,9 +93,9 @@ module Spree
             Spree::WholesaleOrder.accessible_by(current_ability, :show).includes(scope_includes)
           end
 
-          # def current_ability
-          #   @current_ability ||= Spree::WholesalerAbility.new(spree_current_user, spree_current_order)
-          # end
+          def create_service
+            Spree::WholesaleCart::Create.new
+          end
 
           def add_item_service
             Spree::WholesaleCart::AddItem.new
@@ -90,8 +109,8 @@ module Spree
             Spree::WholesaleCart::Empty.new
           end
 
-          def locked_order_service
-            Spree::WholesaleCart::LockedOrder.new
+          def set_quantity_service
+            Spree::WholesaleCart::SetQuantity.new
           end
 
           def render_wholesale_order(result)

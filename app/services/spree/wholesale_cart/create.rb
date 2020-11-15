@@ -5,8 +5,8 @@ module Spree
 
       def call(order:)
 
-        order = Spree::WholesaleOrder.create!(order: order)
-        success(order)
+        wholesale_order = Spree::WholesaleOrder.create!(order: order)
+        success(wholesale_order)
       end
     end
   end

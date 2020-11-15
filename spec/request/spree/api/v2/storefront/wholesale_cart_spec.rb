@@ -31,12 +31,16 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
   end
 
-  shared_examples 'wholesale order' do
+  shared_examples 'returns wholesale order' do
     context "success" do
       before { execute }
       it_behaves_like 'returns 200 HTTP status'
       it_behaves_like 'returns valid wholesale_cart JSON'
     end
+  end
+
+  shared_examples 'wholesale order' do
+    it_behaves_like 'returns wholesale order'
 
     context 'locked wholesale order' do
       before do
@@ -67,6 +71,66 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     let!(:headers)    { order_token }
   end
 
+  describe 'wholesale_cart#create' do
+    let(:options) { {} }
+    let(:execute) { post '/api/v2/storefront/wholesale_cart', headers: headers }
+
+    before do
+      allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
+    end
+
+    shared_examples 'creates wholesale order' do
+      context "success" do
+        before { execute }
+        it_behaves_like 'returns 201 HTTP status'
+        it_behaves_like 'returns valid wholesale_cart JSON'
+      end
+    end
+
+    context 'returns existing wholesale_cart' do
+      it_behaves_like 'creates wholesale order'
+    end
+
+    context 'creates new wholesale_cart' do
+      before do
+        wholesale_order.destroy
+        execute
+      end
+  
+      it_behaves_like 'returns 201 HTTP status'
+
+      it do
+        expect(json_response['data']).to be_present
+        expect(json_response['data']).to have_type('wholesale_order')
+        expect(json_response['data']).to have_attribute(:wholesale_item_total).with_value("0.0")
+        expect(json_response['data']).to have_attribute(:retail_item_total).with_value("0.0")
+        expect(json_response['data']).to have_attribute(:display_wholesale_item_total).with_value("$0.00")
+        expect(json_response['data']).to have_attribute(:display_retail_item_total).with_value("$0.00")
+        expect(json_response['data']).to have_attribute(:item_count).with_value(0)
+      end
+    end
+
+    context 'as a non wholesaler' do
+      let!(:user)  { create(:user) }
+      let!(:order) { create(:order, user: user, store: store, currency: currency) }
+    
+      let!(:user_token) { Doorkeeper::AccessToken.create!(resource_owner_id: order.user.id, expires_in: nil) }
+      let!(:headers_bearer) { { 'Authorization' => "Bearer #{user_token.token}" } }
+      let!(:headers_order_token) { { 'X-Spree-Order-Token' => order.token } }
+      let!(:normal_user_headers) { { 'X-Spree-Order-Token' => order.token, 'Authorization' => "Bearer #{user_token.token}" } }
+      let!(:execute) { post '/api/v2/storefront/wholesale_cart', headers: normal_user_headers }
+
+      before do
+        wholesale_order.destroy
+        execute
+      end
+
+      it_behaves_like 'returns 403 HTTP status'
+    
+    end
+
+  end
+
   describe 'wholesale_Cart#show' do
     before do
       allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
@@ -89,7 +153,6 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
     end
   end
-
 
   describe 'wholesale_Cart#add_item' do
     let(:options) { {} }
@@ -224,5 +287,50 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
 
       it_behaves_like 'no current wholesale order'
     end
+  end
+
+  describe 'wholesale_cart#set_quantity' do
+    let(:options) { {} }
+    let(:wholesale_line_item) { wholesale_order.wholesale_line_items.first }
+    let(:variant) { wholesale_line_item.variant }
+    let(:params) { { wholesale_line_item_id: wholesale_line_item.id, quantity: 1, options: options, include: 'variants' } }
+    let(:execute) { patch '/api/v2/storefront/wholesale_cart/set_quantity', params: params, headers: headers }
+
+    before do
+      allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
+    end
+
+    it_behaves_like 'wholesale order'
+
+    shared_examples 'sets qty' do
+      before { execute }
+
+      it 'with success' do
+        expect(wholesale_order.wholesale_line_items.count).to eq(15)
+        expect(wholesale_order.wholesale_line_items.first.quantity).to eq(1)
+        expect(json_response['included']).to include(have_type('variant').and(have_id(variant.id.to_s)))
+      end
+
+    end
+
+    shared_examples 'doesnt add item with quantity unnavailable' do
+      before do
+        variant.stock_items.first.update(backorderable: false)
+        params[:quantity] = 11
+        execute
+      end
+
+      it_behaves_like 'returns 422 HTTP status'
+
+      it 'returns an error' do
+        expect(json_response[:error]).to eq("Quantity selected of \"#{variant.name} (#{variant.options_text})\" is not available.")
+      end
+    end
+
+    context 'as wholesaler' do
+      it_behaves_like 'sets qty'
+      it_behaves_like 'doesnt add item with quantity unnavailable'
+    end
+
   end
 end
