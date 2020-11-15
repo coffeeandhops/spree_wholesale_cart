@@ -10,6 +10,7 @@ Spree::Core::Engine.add_routes do
           patch  :empty
           delete 'remove_line_item/:wholesale_line_item_id', to: 'wholesale_cart#remove_line_item', as: :wholesale_cart_remove_line_item
           patch  :set_quantity
+          patch :add_to_order
         end
 
       end

@@ -45,7 +45,7 @@ module Spree
         end
         
         ::Spree::TaxRate.adjust(order, line_items) if line_items.count > 0
-
+        return failure(wholesale_order) unless wholesale_order.update_columns(locked: true)
         success(order: order, options: options)
       end
 

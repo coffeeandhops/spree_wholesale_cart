@@ -70,6 +70,15 @@ module Spree
             render_wholesale_order(result)
           end
 
+          def add_to_order
+            spree_authorize! :update, spree_current_order, order_token
+            spree_authorize! :create, Spree::WholesaleOrder
+
+            result = add_to_order_service.call(wholesale_order: spree_current_wholesale_order)
+
+            render_wholesale_order(result)
+          end
+
           private
 
           # THIS HAS BEEN MOVED TO BASE CONTROLLER
@@ -111,6 +120,10 @@ module Spree
 
           def set_quantity_service
             Spree::WholesaleCart::SetQuantity.new
+          end
+          
+          def add_to_order_service
+            Spree::WholesaleCart::AddToOrder.new
           end
 
           def render_wholesale_order(result)

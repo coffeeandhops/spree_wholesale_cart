@@ -71,6 +71,17 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     let!(:headers)    { order_token }
   end
 
+  shared_context 'non wholesale user' do
+    let!(:normal_user)  { create(:user) }
+    let!(:normal_order) { create(:order, user: normal_user, store: store, currency: currency) }
+  
+    let!(:user_token) { Doorkeeper::AccessToken.create!(resource_owner_id: normal_order.user.id, expires_in: nil) }
+    let!(:headers_bearer) { { 'Authorization' => "Bearer #{user_token.token}" } }
+    let!(:headers_order_token) { { 'X-Spree-Order-Token' => normal_order.token } }
+    # let!(:normal_user_headers) { { 'X-Spree-Order-Token' => order.token, 'Authorization' => "Bearer #{user_token.token}" } }
+    let!(:headers) { { 'X-Spree-Order-Token' => normal_order.token, 'Authorization' => "Bearer #{user_token.token}" } }
+  end
+
   describe 'wholesale_cart#create' do
     let(:options) { {} }
     let(:execute) { post '/api/v2/storefront/wholesale_cart', headers: headers }
@@ -111,14 +122,8 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
 
     context 'as a non wholesaler' do
-      let!(:user)  { create(:user) }
-      let!(:order) { create(:order, user: user, store: store, currency: currency) }
-    
-      let!(:user_token) { Doorkeeper::AccessToken.create!(resource_owner_id: order.user.id, expires_in: nil) }
-      let!(:headers_bearer) { { 'Authorization' => "Bearer #{user_token.token}" } }
-      let!(:headers_order_token) { { 'X-Spree-Order-Token' => order.token } }
-      let!(:normal_user_headers) { { 'X-Spree-Order-Token' => order.token, 'Authorization' => "Bearer #{user_token.token}" } }
-      let!(:execute) { post '/api/v2/storefront/wholesale_cart', headers: normal_user_headers }
+
+      include_context 'non wholesale user'
 
       before do
         wholesale_order.destroy
@@ -333,4 +338,36 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
     end
 
   end
+
+  describe 'wholesale_cart#add_to_order' do
+    let(:options) { {} }
+    let(:execute) { patch '/api/v2/storefront/wholesale_cart/add_to_order', headers: headers }
+
+    before do
+      allow_any_instance_of(Spree::Api::V2::Storefront::WholesaleCartController).to receive(:spree_current_order).and_return(order)
+    end
+
+    it_behaves_like 'wholesale order'
+
+    context 'add to order' do
+      before { execute }
+
+      it 'updates order items' do
+        expect(order.reload.item_count).to eq(wholesale_order.item_count)
+      end
+
+      it 'locks wholesale order' do
+        expect(wholesale_order.reload.locked).to be true
+      end
+
+    end
+
+    context 'as a non wholesale user' do
+      include_context 'non wholesale user'
+   
+      before { execute }
+
+      it_behaves_like 'returns 404 HTTP status'
+    end
+  end  
 end
