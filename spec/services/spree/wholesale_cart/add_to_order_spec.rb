@@ -20,6 +20,7 @@ module Spree
         expect(order.line_items.count).to eq(wholesale_order.wholesale_line_items.count)
         expect(order.total).to eq(default_wholesale_total)
         expect(wholesale_order.locked).to be true
+        expect(order.locked).to be true
       end
 
       context 'orders under min' do

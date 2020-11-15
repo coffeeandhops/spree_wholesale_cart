@@ -4,6 +4,7 @@ module SpreeWholesaleOrder
       def self.prepended(base)
         base.has_one :wholesale_order, class_name: "Spree::WholesaleOrder"
         base.delegate :is_wholesale?, :wholesale_item_total, to: :wholesale_order
+        base.delegate :locked, to: :wholesale_order
       end
     end
   end
