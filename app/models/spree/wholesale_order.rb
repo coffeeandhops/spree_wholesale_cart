@@ -39,11 +39,11 @@ module Spree
     attr_accessor :config_minimum_order_value, :minimum_order_on_retail
   
     def minimum_order_value
-      @config_minimum_order_value ||= ::Spree::WholesaleOrder::Config[:minimum_order]
+      @config_minimum_order_value ||= ::Spree::WholesaleCart::Config[:minimum_order]
     end
   
     def minimum_order_on_retail
-      @minimum_order_on_retail ||= ::Spree::WholesaleOrder::Config[:minimum_order_on_retail]
+      @minimum_order_on_retail ||= ::Spree::WholesaleCart::Config[:minimum_order_on_retail]
     end
   
   end

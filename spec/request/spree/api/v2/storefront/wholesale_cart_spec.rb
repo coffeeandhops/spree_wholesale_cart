@@ -5,7 +5,6 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
   let(:store) { create(:store, default_currency: default_currency) }
   let(:currency) { store.default_currency }
   let(:user)  { create(:user) }
-  # let(:order) { create(:order, user: user, currency: default_currency) }
   let(:order) { create(:order, user: user, store: store, currency: currency) }
   let(:variant) { create(:variant) }
 
@@ -14,7 +13,6 @@ describe 'API V2 Storefront Wholesale Cart Spec', type: :request do
   let(:wholesale_headers_bearer) { { 'Authorization' => "Bearer #{wholesale_token.token}" } }
   let(:wholesale_headers_order_token) { { 'X-Spree-Order-Token' => wholesale_order.token } }
   let(:headers) { { 'X-Spree-Order-Token' => wholesale_order.token, 'Authorization' => "Bearer #{wholesale_token.token}" } }
-  # let!(:wholesale_line_item) { create(:wholessale_line_item, wholesale_order: wholesale_order) }
 
 
   shared_examples 'returns valid wholesale_cart JSON' do

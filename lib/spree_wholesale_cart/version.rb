@@ -1,13 +1,13 @@
-module SpreeWholesaleOrder
+module SpreeWholesaleCart
   module_function
 
-  # Returns the version of the currently loaded SpreeWholesaleOrder as a
+  # Returns the version of the currently loaded SpreeWholesaleCart as a
   # <tt>Gem::Version</tt>.
   def version
-    Gem::Version.new VERSION::STRING
+    Gem::Version.new Version::STRING
   end
 
-  module VERSION
+  module Version
     MAJOR = 0
     MINOR = 0
     TINY  = 1

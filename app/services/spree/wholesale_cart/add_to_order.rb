@@ -18,6 +18,14 @@ module Spree
       attr_accessor :allow_under_min_checkout
 
       def add_line_items_to_order(wholesale_order:, options: {})
+        pp "************************************"
+        pp "************************************"
+        pp "************************************"
+        pp wholesale_order.is_wholesale?
+        pp wholesale_order.user
+        pp "************************************"
+        pp "************************************"
+        pp "************************************"
         return failure(wholesale_order) unless wholesale_order.is_wholesale? || allow_under_min_checkout
 
         options ||= {}
@@ -50,7 +58,7 @@ module Spree
       end
 
       def allow_under_min_checkout
-        @allow_under_min_checkout ||= ::Spree::WholesaleOrder::Config[:allow_under_minimum_checkout]
+        @allow_under_min_checkout ||= ::Spree::WholesaleCart::Config[:allow_under_minimum_checkout]
       end
     end
   end

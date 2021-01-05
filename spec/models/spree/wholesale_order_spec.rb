@@ -22,7 +22,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
 
   context "minimum order on wholesale" do
     before do
-      Spree::WholesaleOrder::Config[:minimum_order_on_retail] = false
+      Spree::WholesaleCart::Config[:minimum_order_on_retail] = false
     end
   
     it "should be minimum wholesale order" do
@@ -31,7 +31,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
 
     context "not minimum order" do
       before do
-        Spree::WholesaleOrder::Config[:minimum_order] = 10000.0
+        Spree::WholesaleCart::Config[:minimum_order] = 10000.0
       end
 
       it "should not be minimum wholesale order" do
@@ -43,7 +43,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
 
   context "minimum order on retail" do
     before do
-      Spree::WholesaleOrder::Config[:minimum_order_on_retail] = true
+      Spree::WholesaleCart::Config[:minimum_order_on_retail] = true
     end
 
     it "should be minimum retail order" do
@@ -52,7 +52,7 @@ RSpec.describe Spree::WholesaleOrder, type: :model do
 
     context "not min retail order" do
       before do
-        Spree::WholesaleOrder::Config[:minimum_order] = 5000
+        Spree::WholesaleCart::Config[:minimum_order] = 5000
       end
 
       it "should not be minimum retail order" do

@@ -1,4 +1,4 @@
-module SpreeWholesaleOrder
+module SpreeWholesaleCart
   class Engine < Rails::Engine
     require 'spree/core'
     isolate_namespace Spree
@@ -11,8 +11,8 @@ module SpreeWholesaleOrder
     
     config.autoload_paths += %W(#{config.root}/lib)
     
-    initializer 'spree.wholesale_storefront.environment', before: :load_config_initializers do
-      Spree::WholesaleOrder::Config = ::Spree::WholesaleOrderConfiguration.new
+    initializer 'spree.wholesale_cart.environment', before: :load_config_initializers do
+      Spree::WholesaleCart::Config = ::Spree::WholesaleCartConfiguration.new
     end
 
     def self.activate

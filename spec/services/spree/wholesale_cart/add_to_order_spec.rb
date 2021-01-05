@@ -32,7 +32,7 @@ module Spree
 
         context "allow checkout under min" do
           before do
-            Spree::WholesaleOrder::Config[:allow_under_minimum_checkout] = true
+            Spree::WholesaleCart::Config[:allow_under_minimum_checkout] = true
           end
   
           it "should succeed" do

@@ -75,7 +75,13 @@ module Spree
             spree_authorize! :create, Spree::WholesaleOrder
 
             result = add_to_order_service.call(wholesale_order: spree_current_wholesale_order)
-
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            pp result
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            pp "%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             render_wholesale_order(result)
           end
 

@@ -8,7 +8,7 @@ module Spree
     module_function
 
     def config(*)
-      yield(Spree::WholesaleOrderConfiguration::Config)
+      yield(Spree::WholesaleCart::Config)
     end
   end
 end
